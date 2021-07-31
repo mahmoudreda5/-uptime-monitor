@@ -92,13 +92,13 @@ const checkSchema = new mongoose.Schema({
 }, { timestamps: true });
 
 // relationships
-userSchema.virtual('logs', {
+checkSchema.virtual('logs', {
     ref: 'Log',
     localField: '_id',
     foreignField: 'check'
 });
 
-userSchema.virtual('report', {
+checkSchema.virtual('report', {
     ref: 'Report',
     localField: '_id',
     foreignField: 'check'

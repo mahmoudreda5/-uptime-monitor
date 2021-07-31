@@ -61,6 +61,14 @@ userSchema.statics.findByCredentails = async (email, password) => {
     return user;
 };
 
+userSchema.statics.isValidUpdate = (req) => {
+    const allowedUpdates = ['firstName', 'lastName', 'email', 'password'];
+    const updates = Object.keys(req.body);
+    return updates.every(item => {
+        return allowedUpdates.includes(item);
+    });
+}
+
 // instance methods
 userSchema.methods.generateAuthToken = async function () {
     const user = this;
@@ -79,6 +87,22 @@ userSchema.methods.toJSON = function () {
     delete userObject.tokens;
     return userObject;
 }
+
+userSchema.methods.logout = async function (authToken) {
+    const user = this;
+    user.tokens = user.tokens.filter(token => {
+        return token.token !== authToken;
+    });
+
+    return await user.save();
+};
+
+userSchema.methods.updateProfile = async function (req) {
+    const user = this;
+    const updates = Object.keys(req.body);
+    updates.forEach(update => user[update] = req.body[update]);
+    return await user.save();
+};
 
 // relationships
 userSchema.virtual('checks', {
