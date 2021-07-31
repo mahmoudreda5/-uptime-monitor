@@ -2,6 +2,7 @@ const axios = require('axios');
 const Check = require('./../models/check');
 const Report = require('./../models/report');
 const Log = require('./../models/log');
+const mailer = require('./../services/mailer');
 
 
 const urlConfig = (check) => {
@@ -31,32 +32,38 @@ const run = (check) => {
         const response = await axios.get(url, config);
         // await check.populate('report').execPopulate();
         let report = await Report.findOne({ check: check._id });
-        const upOrDown = response.status >= 200 && response.status < 300;
+        const isUp = response.status >= 200 && response.status < 300;
         if(!report) {
             report = new Report({
                 check: check._id
             });
         }
 
-        if(report.status === 'up' && !upOrDown || report.status === 'down' && upOrDown) {
-            console.log('send notification here..');
+        if(report.status === 'up' && !isUp || report.status === 'down' && isUp) {
+            // todo: make it more generic, refactor
+            await check.populate('owner').execPopulation();
+            mailer.send(
+                check.owner.email,
+                'Server Monitor Notification',
+                isUp ? 'Server is up' : 'Server is down'
+            );
         }
 
-        report.status = upOrDown ? 'up' : 'down';
-        report.availability = upOrDown ? 
+        report.status = isUp ? 'up' : 'down';
+        report.availability = isUp ? 
                             Math.min((report.uptime + check.interval) / (report.uptime + report.downtime) * 100, 100) : 
                             Math.min((report.downtime + check.interval) / (report.uptime + report.downtime) * 100, 100);
-        report.outages = upOrDown ? report.outages : report.outages + 1;
-        report.downtime = upOrDown ? report.downtime : report.downtime + check.interval;
-        report.uptime = upOrDown ? report.uptime + check.interval : report.uptime;
+        report.outages = isUp ? report.outages : report.outages + 1;
+        report.downtime = isUp ? report.downtime : report.downtime + check.interval;
+        report.uptime = isUp ? report.uptime + check.interval : report.uptime;
         report.responseTime = 0;  // to be handled
-        await report.save();
+        report.save();
         
         const log = new Log({
-            status: upOrDown ? 'up' : 'down',
+            status: isUp ? 'up' : 'down',
             check: check._id
         });
-        await log.save();
+        log.save();
     }, check.interval * 1000);
 };
 
