@@ -6,6 +6,11 @@ const logSchema = new mongoose.Schema({
         enum: ['up', 'down'],
         required: true,
         default: 'up'
+    },
+    check: {
+        type: mongoose.Schema.Types.ObjectId,
+        required: true,
+        ref: 'Check'
     }
 }, { timestamps: true });
 

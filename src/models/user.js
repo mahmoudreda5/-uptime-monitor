@@ -3,6 +3,8 @@ const validator = require('validator');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
+const check = require('./check');
+
 const userSchema = new mongoose.Schema({
     firstName: {
         type: String,
@@ -43,6 +45,7 @@ const userSchema = new mongoose.Schema({
     }]
 }, { timestamps: true });
 
+// model methods
 userSchema.statics.findByCredentails = async (email, password) => {
     const user = await User.findOne({ email });
     if(!user) {
@@ -57,6 +60,7 @@ userSchema.statics.findByCredentails = async (email, password) => {
     return user;
 };
 
+// instance methods
 userSchema.methods.generateAuthToken = async function () {
     const user = this;
     const token = jwt.sign({ _id: user._id.toString() }, 'random');
@@ -74,6 +78,13 @@ userSchema.methods.toJSON = function () {
     delete userObject.tokens;
     return userObject;
 }
+
+// relationships
+userSchema.virtual('checks', {
+    ref: 'Check',
+    localField: '_id',
+    foreignField: 'owner'
+});
 
 // hash plain text password before saving
 userSchema.pre('save', async function (next) {

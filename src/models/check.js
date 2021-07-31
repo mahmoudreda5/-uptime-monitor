@@ -83,8 +83,26 @@ const checkSchema = new mongoose.Schema({
     ignoreSSL: {
         type: Boolean,
         default: false
+    },
+    owner: {
+        type: mongoose.Schema.Types.ObjectId,
+        required: true,
+        ref: 'User'
     }
 }, { timestamps: true });
+
+// relationships
+userSchema.virtual('logs', {
+    ref: 'Log',
+    localField: '_id',
+    foreignField: 'check'
+});
+
+userSchema.virtual('report', {
+    ref: 'Report',
+    localField: '_id',
+    foreignField: 'check'
+});
 
 const Check = mongoose.model('Check', checkSchema);
 

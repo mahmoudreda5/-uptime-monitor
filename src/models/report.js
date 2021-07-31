@@ -25,6 +25,11 @@ const reportSchema = new mongoose.Schema({
     responseTime: {
         type: Number,
         required: true
+    },
+    check: {
+        type: mongoose.Schema.Types.ObjectId,
+        required: true,
+        ref: 'Check'
     }
 }, { timestamps: true });
 
