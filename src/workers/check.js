@@ -33,10 +33,13 @@ const run = (check) => {
         let report = await Report.findOne({ check: check._id });
         const upOrDown = response.status >= 200 && response.status < 300;
         if(!report) {
-            // based on response status
             report = new Report({
                 check: check._id
             });
+        }
+
+        if(report.status === 'up' && !upOrDown || report.status === 'down' && upOrDown) {
+            console.log('send notification here..');
         }
 
         report.status = upOrDown ? 'up' : 'down';
