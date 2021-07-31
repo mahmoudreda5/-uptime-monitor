@@ -10,4 +10,6 @@ router.get('/checks/:id', auth, CheckController.retrieve);
 router.patch('/checks/:id', auth, CheckController.update);
 router.delete('/checks/:id', auth, CheckController.remove);
 
+router.get('/checks/run/:id', auth, CheckController.run);
+
 module.exports = router;

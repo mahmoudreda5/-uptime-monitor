@@ -44,13 +44,13 @@ const checkSchema = new mongoose.Schema({
     },
     interval: {
         type: Number,
-        default: 10
+        default: 10 * 60
     },
     threshold: {
         type: Number,
         default: 1
     },
-    authentication: {
+    auth: {
         type: {
             username: {
                 type: String,
@@ -62,7 +62,7 @@ const checkSchema = new mongoose.Schema({
             }
         },
     },
-    httpHeaders: {
+    headers: {
         type: Map,
         of: String
     },

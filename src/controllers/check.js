@@ -1,4 +1,5 @@
 const Check = require('./../models/check');
+const CheckWorker = require('./../workers/check');
 
 const create = async (req, res) => {
     try {
@@ -70,10 +71,30 @@ const remove = async (req, res) => {
     }
 };
 
+const run = async (req, res) => {
+    try {
+        const _id = req.params.id;
+        const owner = req.user._id;
+
+        const check = await Check.findOne({ _id, owner });
+        if(!check) {
+            return res.status(404).send('check not found!');
+        }
+
+        // run check worker
+        CheckWorker.run(check);
+
+        return res.send(`check ${check.name} monitoring start..`);
+    } catch (e) {
+        return res.status(500).send(e.message);
+    }
+};
+
 module.exports = {
     create,
     retrieveAll,
     retrieve,
     update,
-    remove
+    remove,
+    run
 };
