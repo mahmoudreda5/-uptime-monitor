@@ -1,3 +1,4 @@
+const Report = require('../models/report');
 const Check = require('./../models/check');
 const CheckWorker = require('./../workers/check');
 
@@ -90,11 +91,31 @@ const run = async (req, res) => {
     }
 };
 
+const retrieveReport = async (req, res) => {
+    try {
+        const _id = req.params.checkId;
+        const owner = req.user._id;
+
+        const check = await Check.findOne({ _id, owner });
+        if(!check) {
+            return res.status(404).send('check not found!');
+        }
+        const report = await Report.findOne({ check: check._id });
+        if(!report) {
+            return res.status(404).send('check has no reports!');
+        }
+        return res.send(report);
+    } catch (e) {
+        return res.status(500).send(e.message);
+    }
+};
+
 module.exports = {
     create,
     retrieveAll,
     retrieve,
     update,
     remove,
-    run
+    run,
+    retrieveReport
 };

@@ -11,5 +11,6 @@ router.patch('/checks/:id', auth, CheckController.update);
 router.delete('/checks/:id', auth, CheckController.remove);
 
 router.get('/checks/run/:id', auth, CheckController.run);
+router.get('/checks/report/:checkId', auth, CheckController.retrieveReport);
 
 module.exports = router;
