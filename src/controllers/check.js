@@ -25,6 +25,21 @@ const retrieveAll = async (req, res) => {
     }
 };
 
+const retrieveByTag =  async (req, res) => {
+    try {
+        const tag = req.params.tag;
+        const owner = req.user._id;
+
+        const checks = await Check.find({ 'tags.tag': tag, owner });
+        if(!checks.length) {
+            return res.status(404).send('check not found!');
+        }
+        return res.send(checks);
+    } catch (e) {
+        return res.status(500).send(e.message);
+    }
+};
+
 const retrieve = async (req, res) => {
     try {
         const _id = req.params.id;
@@ -113,6 +128,7 @@ const retrieveReport = async (req, res) => {
 module.exports = {
     create,
     retrieveAll,
+    retrieveByTag,
     retrieve,
     update,
     remove,
