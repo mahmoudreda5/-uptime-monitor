@@ -11,7 +11,7 @@ const register = async (req, res) => {
         }
         return res.status(409).send('User already exists');
     } catch (e) {
-        res.status(400).send(e.message);
+        return res.status(400).send(e.message);
     }
 };
 
@@ -21,7 +21,7 @@ const login = async (req, res) => {
         const password = req.body.password;
         const user = await User.findByCredentails(email, password);
         const token = await user.generateAuthToken();
-        res.send({ token, user });
+        return res.send({ token, user });
     } catch (e) {
         return res.status(401).send(e.message);
     }
@@ -37,7 +37,7 @@ const logout = async (req, res) => {
     }
 }
 
-const updateUserProfile = async (req, res) => {
+const updateProfile = async (req, res) => {
     try {
         if(!User.isValidUpdate(req)) {
             return res.status(404).send('Invalid updates.');
@@ -54,6 +54,6 @@ module.exports = {
     register,
     login,
     logout,
-    updateUserProfile
+    updateProfile
 };
 

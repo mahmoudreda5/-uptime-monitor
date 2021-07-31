@@ -91,6 +91,37 @@ const checkSchema = new mongoose.Schema({
     }
 }, { timestamps: true });
 
+
+checkSchema.statics.isValidUpdate = (req) => {
+    const allowedUpdates = [
+        'name', 
+        'url', 
+        'protocol', 
+        'path', 
+        'port', 
+        'webhook', 
+        'timeout', 
+        'interval', 
+        'threshold', 
+        'authentication', 
+        'httpHeaders', 
+        'assert', 
+        'tags', 
+        'ignoreSSL'
+    ];
+    const updates = Object.keys(req.body);
+    return updates.every(item => {
+        return allowedUpdates.includes(item);
+    });
+};
+
+checkSchema.methods.update =  async function (req) {
+    const check = this;
+    const updates = Object.keys(req.body);
+    updates.forEach(update => check[update] = req.body[update]);
+    return await check.save();
+};
+
 // relationships
 checkSchema.virtual('logs', {
     ref: 'Log',
