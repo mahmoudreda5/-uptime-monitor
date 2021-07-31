@@ -1,6 +1,9 @@
 const mongoose = require('mongoose');
 const validator = require('validator');
 
+const Report = require('./report');
+const Log = require('./log');
+
 const checkSchema = new mongoose.Schema({
     name: {
         type: String,
@@ -133,6 +136,14 @@ checkSchema.virtual('report', {
     ref: 'Report',
     localField: '_id',
     foreignField: 'check'
+});
+
+checkSchema.pre('remove', async function (next) {
+    const check = this;
+
+    await Report.deleteOne({ check: check._id });
+    await Log.deleteMany({ check: check._id });
+    next();
 });
 
 const Check = mongoose.model('Check', checkSchema);
