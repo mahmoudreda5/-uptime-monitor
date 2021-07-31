@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
+const config = require('./../config/config');
 
-const databaseName = 'server-monitor-api';
-const connectionUrl = `mongodb://127.0.0.1:27017/${databaseName}`;
+const connectionUrl = `mongodb://${config.database.host}:${config.database.port}/${config.database.name}`;
 mongoose.connect(connectionUrl, {
     useNewUrlParser: true,
     useCreateIndex: true
@@ -9,4 +9,4 @@ mongoose.connect(connectionUrl, {
 
 const database = mongoose.connection;
 database.on('error', console.error.bind(console, 'Database connection error'));
-database.once('open', console.info.bind(console, 'Database connected on port 27017'));
+database.once('open', console.info.bind(console, `Database connected on port ${config.database.port}`));
