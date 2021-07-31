@@ -1,1 +1,1 @@
-Server-monitor application using nodejs
+uptime-monitor application using nodejs
